@@ -1,4 +1,4 @@
-# Predict Free Trials generated per campaign
+# Predict free trials by campaign strategies
 This code repository is for the Data Science and Engineering OA's. This repository stores Robinhood, Klaviyo, and MLB projects.
 
 ### Campaign Problem:
