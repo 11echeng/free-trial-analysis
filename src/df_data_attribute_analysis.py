@@ -1,7 +1,5 @@
 import pandas as pd
 
-import pandas as pd
-
 def categorize_columns(df):
     # Initialize arrays to hold column names
     categories = {
