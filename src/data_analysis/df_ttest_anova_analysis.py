@@ -1,6 +1,8 @@
 import pandas as pd
 from scipy import stats
 import numpy as np
+import logging 
+
 def run_univariate_tests(
     df: pd.DataFrame,
     categorical_cols: list,
@@ -168,7 +170,8 @@ def run_one_sample_ttest(
                     if stat_type == "mean":
                         sample_metric = data_array.mean() if sample_size > 0 else None
                     else:
-                        sample_metric = np.median(data_array) if sample_size > 0 else None
+                        logging.warning(f"Unknown stat_type: {stat_type}. Defaulting to mean.")
+                        #sample_metric = np.median(data_array) if sample_size > 0 else None
 
                     # Determine reject/fail decision
                     decision = (
@@ -182,7 +185,7 @@ def run_one_sample_ttest(
                         "Category": category_value,
                         "Quantitative Variable": quant_col,
                         "Sample Size": sample_size,
-                        "Sample Stat": sample_metric,
+                        "Sample Mean": sample_metric,
                         "T-statistic": t_result.statistic,
                         "p-value": t_result.pvalue,
                         "Decision": decision,
