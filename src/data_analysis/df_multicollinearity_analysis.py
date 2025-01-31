@@ -11,7 +11,7 @@ def compute_vif(data: pd.DataFrame, drop_constant: bool = True, drop_first: bool
     # Step 1: Make a copy of the data
     df = data.copy()
     # print("Initial DataFrame:")
-    # print(df.head())
+    # print(df.head())w
 
     # Step 2: One-hot encode categorical variables (if any)
     cat_cols = df.select_dtypes(include=["object", "category", "bool"]).columns
