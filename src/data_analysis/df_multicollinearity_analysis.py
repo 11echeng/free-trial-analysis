@@ -67,3 +67,57 @@ def compute_vif(data: pd.DataFrame, drop_constant: bool = True, drop_first: bool
     # print(vif_df)
 
     return vif_df
+
+def compute_vif_vectorized(data: pd.DataFrame, drop_first: bool = True) -> pd.DataFrame:
+    """
+    Compute Variance Inflation Factor (VIF) for all numeric and one-hot encoded features
+    using a vectorized approach via the inverse of the correlation matrix.
+
+    Parameters:
+        data (pd.DataFrame): The input DataFrame.
+        drop_first (bool): Whether to drop the first category during one-hot encoding.
+
+    Returns:
+        pd.DataFrame: A DataFrame with two columns: 'Feature' and 'VIF', sorted by VIF descending.
+    """
+    # Step 1: Copy the data
+    df = data.copy()
+
+    # Step 2: One-hot encode categorical variables (if any)
+    cat_cols = df.select_dtypes(include=["object", "category", "bool"]).columns
+    if len(cat_cols) > 0:
+        df = pd.get_dummies(df, columns=cat_cols, drop_first=drop_first)
+
+    # Step 3: Ensure all features are numeric and handle non-numeric entries
+    df = df.apply(pd.to_numeric, errors='coerce')
+
+    # Step 4: Replace infinite values and drop rows with NaNs
+    df = df.replace([np.inf, -np.inf], np.nan).dropna()
+
+    # Ensure all values are floats (this helps with numerical stability)
+    df = df.astype(float)
+
+    # (Optional) If you were previously adding a constant for regression,
+    # you typically do NOT include the constant when computing VIF.
+    # Thus, we leave it out here.
+
+    # Step 5: Compute the correlation matrix
+    corr_matrix = df.corr()
+
+    # Step 6: Invert the correlation matrix
+    # If the matrix is nearly singular, use the pseudo-inverse
+    try:
+        inv_corr_matrix = np.linalg.inv(corr_matrix.values)
+    except np.linalg.LinAlgError:
+        inv_corr_matrix = np.linalg.pinv(corr_matrix.values)
+
+    # Step 7: Extract VIFs from the diagonal of the inverse correlation matrix
+    vif_values = np.diag(inv_corr_matrix)
+
+    # Step 8: Format the results in a DataFrame
+    vif_df = pd.DataFrame({
+        "Feature": corr_matrix.columns,
+        "VIF": vif_values
+    }).sort_values(by="VIF", ascending=False).reset_index(drop=True)
+
+    return vif_df
