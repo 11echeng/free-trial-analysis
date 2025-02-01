@@ -1,6 +1,6 @@
 paths:
-  raw_data: "./data/raw/"
-  processed_data: "./data/processed/"
+  raw_data: "./data/raw_data/"
+  processed_data: "./data/processed_data/"
   models: "./artifacts/models/"
 hyperparameters:
   model:
